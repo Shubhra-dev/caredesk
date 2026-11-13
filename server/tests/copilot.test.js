@@ -16,7 +16,7 @@ test('live adapter performs a bounded tool round trip with an injected provider'
     const body = JSON.parse(options.body);
     calls++;
     if (calls === 1) {
-      assert.equal(body.tools.length, 2);
+      assert.ok(body.tools.length >= 9);
       return Response.json({
         choices: [
           {
@@ -84,7 +84,7 @@ test('invalid model tools cannot write data and the tool loop is capped', async 
       apiKey: 'test',
       model: 'test',
     }),
-    /tool limit/,
+    /reasoning limit/,
   );
   assert.equal(count, 4);
   assert.equal(db.prepare('SELECT COUNT(*) n FROM patients').get().n, before);

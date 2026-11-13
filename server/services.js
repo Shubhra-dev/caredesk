@@ -3,8 +3,8 @@ import { transaction, audit, today } from './db.js';
 import { requireThat } from './validation.js';
 export const invoiceQuery = `SELECT i.*,a.patient_id,a.doctor_id,a.visit_date,a.token,a.status appointment_status,p.full_name,p.mrn,p.phone,d.name doctor_name,COALESCE((SELECT SUM(amount) FROM payments pay WHERE pay.invoice_id=i.id AND pay.reversed_at IS NULL),0) paid FROM invoices i JOIN appointments a ON a.id=i.appointment_id JOIN patients p ON p.id=a.patient_id JOIN doctors d ON d.id=a.doctor_id`;
 export const appointmentQuery = `SELECT a.*,p.full_name,p.mrn,p.phone,d.name doctor_name,d.specialty,i.id invoice_id,i.number invoice_number,i.total,COALESCE((SELECT SUM(amount) FROM payments pay WHERE pay.invoice_id=i.id AND pay.reversed_at IS NULL),0) paid FROM appointments a JOIN patients p ON p.id=a.patient_id JOIN doctors d ON d.id=a.doctor_id JOIN invoices i ON i.appointment_id=a.id`;
-export function createAppointment(db, data, userId) {
-  return transaction(db, () => {
+export function createAppointment(db, data, userId, { wrapTransaction = true } = {}) {
+  const operation = () => {
     const doctor = db.prepare('SELECT * FROM doctors WHERE id=? AND active=1').get(data.doctorId);
     requireThat(doctor, 404, 'Active doctor not found.');
     requireThat(
@@ -46,7 +46,8 @@ export function createAppointment(db, data, userId) {
     );
     audit(db, userId, 'APPOINTMENT_CREATED', id);
     return db.prepare(`${appointmentQuery} WHERE a.id=?`).get(id);
-  });
+  };
+  return wrapTransaction ? transaction(db, operation) : operation();
 }
 export function recordPayment(db, invoiceId, data, userId) {
   return transaction(db, () => {

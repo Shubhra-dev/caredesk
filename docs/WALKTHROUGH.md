@@ -67,13 +67,11 @@ Practice: login as receptionist and directly request /api/reports/daily. Explain
 
 Read CopilotPage → server/routes/copilot.js → server/copilot.js → server/ai/provider.js → executeTool → existing report/query services. Provider selection supports Gemini free-tier learning and optional OpenAI.
 
-Local mode is deterministic and clearly labelled. Live mode sends a question and tool schemas to a model, validates its proposed call, executes only allowed read operations, then sends results back. The model does not have a database connection or unrestricted SQL. Four-turn cap and timeouts bound execution; they are not a full cost/abuse management system. Access checks happen before the model call.
+Local mode is deterministic and clearly labelled. Live mode sends recent conversation, tool schemas and context to the model. The model proposes tools; backend code validates and executes them. Reports/lookup/history are reads; prepare tools save an expiring draft only. The separate authenticated Confirm route creates the patient or appointment/invoice inside a transaction. See `COPILOT_FLOW.md` for the module-by-module path.
 
-This is a bounded tool-using copilot, not a general autonomous agent. The same pattern can power a school attendance assistant, store order-status assistant or CMS report copilot. RAG is useful when the task actually needs retrieval from documents; this MVP doesn't need embeddings to query structured totals.
+**নোট করো:** model proposal, persisted draft এবং committed record তিনটি আলাদা state। Prompt authorization নয়। A confirmation retry must be idempotent. Shared conversation history is never accepted from arbitrary client JSON; the backend loads the owner's history. External provider receives question/history/tool results.
 
-**নোট করো:** prompt instructions are not authorization. Tools enforce boundaries. Structured tool arguments still require runtime validation. Verified numbers do not guarantee the model's prose is correct. User question text is also data sent externally.
-
-Practice: request an unsupported write action. Inspect mode and tool trace. Explain the difference between local demo, model answer, and actual tool execution.
+Practice: ask for a fictional booking. Before Confirm, check that appointment count is unchanged. Cancel and explain what changed in the database. Then request a new preview and confirm. Explain why the model cannot directly call Confirm.
 
 ## 7. Verification and handover
 

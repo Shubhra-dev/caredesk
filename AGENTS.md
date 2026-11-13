@@ -21,7 +21,7 @@ Inspect before editing; preserve minimal relevant diffs. Trace screen → reques
 - Patient request keys and payment request keys must preserve retry idempotency.
 - Shared phone numbers are valid. Never make phone unique or auto-merge patients.
 - Do not delete payment/audit history. Reversals are administrator-only.
-- Never add unrestricted SQL, writes or medical recommendations to Copilot. Validate every tool call.
+- Never add unrestricted SQL, financial writes or medical recommendations to Copilot. Registration and booking tools may ONLY stage owner-bound expiring previews; only a separate human Confirm endpoint may commit them. Validate every tool call and recheck permissions/capacity/fees at confirmation.
 - Never commit .env, API keys, runtime databases, backups or real patient data.
 - Add meaningful regression coverage for changed auth/financial/state-transition behavior; run npm run check.
 - Do not claim browser or live-provider tests ran unless they actually did.

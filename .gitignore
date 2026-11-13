@@ -8,3 +8,5 @@ backups/
 *.log
 *.tsbuildinfo
 playwright-results/
+
+.update-backups/

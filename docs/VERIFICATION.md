@@ -1,24 +1,18 @@
-# Verification record — 8 November 2026
+# Verification record — 10 November 2026
 
-## Completed in the authoring environment
+## 0.2.0 checks
 
-- Node.js 24.22.1.
-- TypeScript strict compile and Vite production build.
-- 20 Node backend tests, including HTTP routes, real SQLite transactions, permissions, idempotency, financial reversals, normalized searches and mocked-provider orchestration.
-- 9 Vitest frontend tests, including component interactions, currency conversion, and a full React UI → real HTTP API → SQLite workflow in DOM emulation.
-- Prettier formatting check.
-- npm audit: 0 known vulnerabilities in the resolved dependency set at check time. This is a point-in-time package advisory result, not a security certification.
-- Online SQLite backup created, opened as a separate database and PRAGMA integrity_check returned ok.
+- Node 24; TypeScript strict compile and Vite production build passed.
+- 31 backend tests: auth/CSRF/roles, real SQLite transactions, payment/reversal correctness, provider orchestration, owner-bound drafts, revision locking, ambiguous selection, unobserved-ID rejection, fee/capacity rechecks, expiry/cancellation/supersession, idempotent and concurrent confirmation, production action gate and bounded reporting.
+- 10 frontend tests: form regression and full React → real HTTP API → SQLite flows under DOM emulation. Copilot test covers lookup, preview without booking, Confirm, selected-patient follow-up, and conversation restore. Provider responses are simulated.
+- Prettier formatting check passed.
+- Update installer exercised against a temporary existing project: nested source copied; existing .env/database bytes preserved; previous source backed up.
 
-## Not verified
+## Not verified here
 
-- Native Chromium visual, focus, mobile-layout and print checks: process startup failed because this environment disallows the needed socket operation. DOM emulation does not replace browser E2E or visual QA.
-- Live credentialed Gemini/OpenAI request: no real API key/model account was supplied. Tool orchestration was tested with a simulated provider; local demo uses real internal services.
-- Native Windows execution: scripts avoid shell-specific task chaining for the dev runner, but actual Windows install/browser acceptance must run on the user's PC.
-- Public HTTPS deployment, customer pilot, medical-data/legal compliance, external security audit or production load testing.
+- Real credentialed Gemini/OpenAI generation; no user API key supplied. Model visibility/answer behavior/quota must be checked on the user's account.
+- Native Chromium visual/focus/mobile/print checks: browser process startup is restricted in this environment. DOM emulation does not replace browser QA.
+- Native Windows installation/updater execution. Cross-platform updater logic was tested on Linux; Windows acceptance remains required.
+- Public deployment, production load, independent security/privacy review or customer pilot.
 
-See ACCEPTANCE.md before claiming a customer-ready release. The checks establish a local MVP foundation and do not guarantee commercial readiness.
-
-## 0.1.1 regression update
-
-A queued native dialog close event under StrictMode was reproduced as a failing regression test before the fix. The corrected Modal ignores stale close events after reopening. Full workflow now runs under StrictMode in DOM emulation; native browser validation is still pending. Gemini adapter tool flow and no-fallback quota errors are simulated-provider tests, not a live API claim.
+Earlier release checks included an online SQLite backup integrity test and dependency audit. They are historical checks, not new 0.2.0 security certification. Follow ACCEPTANCE.md and DEPLOYMENT.md before a customer pilot.

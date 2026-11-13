@@ -34,7 +34,12 @@ These checks are manual and NOT claimed as completed in the authoring environmen
 
 - No key/model: visibly LOCAL DEMO, not misrepresented as AI.
 - Collection/queue query: displayed tool output matches report page.
-- Unsupported question returns limitation.
+- Fictional patient lookup: ambiguous names show selection cards; choose a person and continue.
+- Booking preview creates no appointment; Cancel creates none. Confirm creates exactly one appointment/invoice and displays its link.
+- Refresh restores conversation. Follow-up “এই রোগীর বকেয়া কত?” uses selected patient.
+- New question supersedes old preview; expired/changed-fee/full-capacity confirmations fail clearly.
+- New-patient preview validates required fields; shared phone requires explicit acknowledgement.
+- Unsupported actions return limitations.
 - Live mode: valid account model, real key, provider timeout/auth/rate-limit tested.
 - Never use real patient text in prompts during testing.
 - Requests for deletion/diagnosis/payment execution do not trigger writes.

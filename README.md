@@ -1,8 +1,8 @@
-# CareDesk — Clinic Operations MVP (0.1.1)
+# CareDesk — Clinic Operations MVP (0.2.0)
 
 একটি ছোট outpatient clinic-এর জন্য working, single-clinic learning MVP। React + TypeScript frontend, Express backend, persistent SQLite database এবং bounded operations copilot আছে। এটি production-certified medical software নয়; real patient data ব্যবহারের আগে pilot ও deployment review দরকার।
 
-Existing installation? Read **docs/UPDATE_0_1_1.md** first; preserve your .env and data directory.
+Existing installation? Read **docs/UPDATE_0_2_0.md** first; preserve your .env and data directory.
 
 ## Windows-এ চালানো
 
@@ -38,7 +38,7 @@ Browser: **http://127.0.0.1:5173**। Terminal খোলা রাখবে; `Ct
 - Partial/full payments, retry-safe payment keys, overpayment rejection, administrator reversal and audit trail.
 - Printable invoice/payment history; daily collections, reversals, visit dues.
 - Doctor fees/capacity/availability; staff creation; password change and session invalidation.
-- Read-only Admin Copilot: verified collection report and identifier-free queue summary.
+- Admin Copilot: conversation memory, patient/doctor selection, availability, patient history/dues, report ranges, registration and booking previews with explicit confirmation.
 - SQLite online backup command; setup, file walkthrough, testing and deployment notes.
 
 ## Commands
@@ -58,13 +58,17 @@ npm run backup
 
 **No configured key:** `LOCAL_DEMO` is a small rule-based router, not an LLM or autonomous agent. It calls the same verified backend tools. Try “Show collection report for YYYY-MM-DD” or “Show appointment queue for YYYY-MM-DD”.
 
-**Live AI (free-tier learning):** use a Google AI Studio free-tier project/key. Set `AI_PROVIDER=gemini`, `GEMINI_API_KEY` and `GEMINI_MODEL=gemini-3.5-flash-lite` in `.env`, then restart. Verify your own project quota/model availability; keep billing disabled for zero-spend practice. No paid-provider fallback is attempted. See `docs/UPDATE_0_1_1.md`. Existing OpenAI support remains optional via `AI_PROVIDER=openai`, `OPENAI_API_KEY` and `OPENAI_MODEL` (not a free API promise). Keys stay server-side.
+**Live AI (free-tier learning):** use a Google AI Studio free-tier project/key. Set `AI_PROVIDER=gemini`, `GEMINI_API_KEY` and `GEMINI_MODEL=gemini-3.5-flash-lite` in `.env`, then restart. Verify your own project quota/model availability; keep billing disabled for zero-spend practice. No paid-provider fallback is attempted. See `docs/UPDATE_0_2_0.md`. Existing OpenAI support remains optional via `AI_PROVIDER=openai`, `OPENAI_API_KEY` and `OPENAI_MODEL` (not a free API promise). Keys stay server-side.
 
-Live flow: question → model selects allowed tool → server validates arguments → server reads authorized data → tool result → model answer. Maximum four model turns, at most three tool calls per turn, request timeouts, and a basic per-process daily request cap. The cap resets on restart; this is not a durable billing budget.
+Live flow: question + recent conversation → model proposes an allowed tool → backend validates scope and arguments → database result → model answer or action preview. Gemini never receives database credentials or a SQL connection. See `docs/COPILOT_FLOW.md` for the exact file map.
 
-No diagnosis, prescription, writes, raw SQL or arbitrary tool execution. Queue tools omit patient names/phones/MRNs; aggregate reports contain no patient identifiers. **Your question is sent to the external provider in live mode: do not enter patient or medical information.** Production requires a provider/data-handling review. Live prose can be inaccurate; inspect the displayed tool output. Staff-created names such as doctor names remain in queue summaries.
+Nine tools support reports, bounded date ranges, patient/doctor lookup, availability, patient history, registration previews and booking previews. Only the separate authenticated **Confirm** endpoint can create the patient or appointment/invoice. The model cannot confirm, collect money, diagnose, delete or run SQL. Ambiguous people require explicit selection. New questions/selections supersede earlier pending previews; previews expire after 15 minutes. Confirmation rechecks current fees, identity, capacity and duplicate bookings. Retries return the same confirmed result.
 
-OpenAI and Gemini adapter orchestration are tested with simulated providers. No real credentialed provider generation call has been verified here. `npm run ai:check` checks model visibility for your Gemini key without generation.
+Conversation events and the last six complete model turns persist in SQLite, separately for each administrator. The UI retains at most 60 events per conversation. Execution is limited to four provider rounds, three tools per round and 30 questions per user per Dhaka calendar day, persisted across restarts. This is a basic usage cap, not a provider billing budget. Direct lookup uses the backend without an LLM call.
+
+**Use fictional patient records for free-tier learning.** Questions, recent model history and returned tool data (including patient identifiers when patient tools run) are sent to the selected external provider. Patient tools are disabled in production unless `COPILOT_PATIENT_TOOLS_APPROVED=true`; enable only after provider/data-handling review. This flag is an operational gate, not proof of compliance. The copilot remains Admin-only. AI prose can be wrong; inspect the evidence and preview.
+
+Local Demo still handles only reports and queues; task planning needs a configured live provider. Adapter orchestration is tested with simulated providers; no real credentialed provider request was run in the authoring environment. `npm run ai:check` checks Gemini model visibility without generation and does not establish quota availability.
 
 ## Scope decisions / limitations
 

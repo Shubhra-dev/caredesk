@@ -45,4 +45,4 @@ npm run check
 
 ## আগে project চালিয়ে থাকলে
 
-`docs/UPDATE_0_1_1.md` অনুসরণ করো। `.env` ও `data/` অক্ষত রাখবে। এই update shared modal form-এর StrictMode close-event bug ঠিক করে এবং Gemini real AI adapter যোগ করে।
+`docs/UPDATE_0_2_0.md` অনুসরণ করো। আলাদা folder-এ নতুন ZIP extract করে updater চালাবে; এটি `.env` ও `data/` অক্ষত রেখে source/config update করে। Copilot-এর full flow এবং file map: `docs/COPILOT_FLOW.md`।
